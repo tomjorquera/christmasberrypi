@@ -1,0 +1,10 @@
+[Unit]
+Description=Chrismas lights
+After=getty.target
+
+[Service]
+ExecStart=/home/tom/chrismas_start.sh
+
+[Install]
+WantedBy=default.target
+

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		#tree {
+			font-size: 18px;
+			display: block;
+			text-align: center;
+		}
+		#tree pre {
+			display: inline-block;
+			text-align: left;
+		}
+		button {
+			width: 100%;
+			height: 150px;
+			display: block;
+			font-size: 24px;
+		}
+		
+	</style>
+</head>
+<body>
+	<div id="tree">
+		<pre>
+      _\/_
+       /\
+       /\
+      /  \
+      /~~\o
+     /o   \
+    /~~*~~~\
+   o/    o \
+   /~~~~~~~~\~`
+  /__*_______\
+       ||
+     \====/
+      \__/
+		</pre>
+	</div>
+	<div>
+		<button onclick="turnoff()">OFF</button>
+	</div>
+	<div>
+		<button onclick="turnon()">ON</button>
+	</div>
+	<script>
+		function turnoff() {
+			fetch('/api/off', {
+			    method: 'GET',
+			})
+		}
+
+		function turnon() {
+			fetch('/api/on', {
+			    method: 'GET',
+			})
+		}
+	</script>
+</body>
+</html>
