@@ -11,11 +11,22 @@
 			display: inline-block;
 			text-align: left;
 		}
-		button {
-			width: 100%;
-			height: 150px;
+		.inputcontainer * {
 			display: block;
 			font-size: 24px;
+		}
+
+		.inputcontainer input {
+			width: 100%;
+		}
+
+		.inputcontainer button {
+			width: 100%;
+			height: 150px;
+		}
+		.inputcontainer datalist {
+			display: flex;
+			justify-content: space-between;
 		}
 		
 	</style>
@@ -38,24 +49,123 @@
       \__/
 		</pre>
 	</div>
-	<div>
+	<div class="inputcontainer">
 		<button onclick="turnoff()">OFF</button>
 	</div>
-	<div>
+	<div class="inputcontainer">
 		<button onclick="turnon()">ON</button>
+	</div>
+	<div class="inputcontainer">
+		<label for="intensity">INTENSITY</label>
+		<input type="range" id="intensity" min="0.0" max="1.0" step="0.1" value="0.8" list="intensity_markers" onchange="put_intensity()"></input>
+		<datalist id="intensity_markers">
+			<option value="0.0" label="0.0"></option>
+			<option value="0.1" label="0.1"></option>
+			<option value="0.2" label="0.2"></option>
+			<option value="0.3" label="0.3"></option>
+			<option value="0.4" label="0.4"></option>
+			<option value="0.5" label="0.5"></option>
+			<option value="0.6" label="0.6"></option>
+			<option value="0.7" label="0.7"></option>
+			<option value="0.8" label="0.8"></option>
+			<option value="0.9" label="0.9"></option>
+			<option value="1.0" label="1.0"></option>
+		</datalist>
+	</div>
+	<div class="inputcontainer">
+		<label for="delay">DELAY</label>
+		<input type="range" id="delay" min="0.0" max="2.0" step="0.1" value="0.8" list="delay_markers" onchange="put_delay()"></input>
+		<datalist id="delay_markers">
+			<option value="0.0" label="0.0"></option>
+			<option value="0.1"></option>
+			<option value="0.2" label="0.2"></option>
+			<option value="0.3"></option>
+			<option value="0.4" label="0.4"></option>
+			<option value="0.5"></option>
+			<option value="0.6" label="0.6"></option>
+			<option value="0.7"></option>
+			<option value="0.8" label="0.8"></option>
+			<option value="0.9"></option>
+			<option value="1.0" label="1.0"></option>
+			<option value="1.1"></option>
+			<option value="1.2" label="1.2"></option>
+			<option value="1.3"></option>
+			<option value="1.4" label="1.4"></option>
+			<option value="1.5"></option>
+			<option value="1.6" label="1.6"></option>
+			<option value="1.7"></option>
+			<option value="1.8" label="1.8"></option>
+			<option value="1.9"></option>
+			<option value="2.0" label="2.0"></option>
+		</datalist>
 	</div>
 	<script>
 		function turnoff() {
 			fetch('/api/off', {
 			    method: 'GET',
 			})
+			update_ui_state();
 		}
 
 		function turnon() {
 			fetch('/api/on', {
 			    method: 'GET',
 			})
+			update_ui_state();
+
 		}
+
+		async function get_intensity() {
+			const res = await fetch('/api/intensity', {
+			    method: 'GET',
+			})
+			return await res.json();
+		}
+
+		async function put_intensity() {
+			const intensity_control = document.getElementById("intensity")
+			const body = JSON.stringify({
+				"value": parseFloat(intensity_control.value),
+			});
+			const res = await fetch('/api/intensity', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body,
+			});
+			update_ui_state()
+		}
+
+		async function get_delay() {
+			const res = await fetch('/api/delay', {
+			    method: 'GET',
+			})
+			return await res.json();
+		}
+
+		async function put_delay() {
+			const delay_control = document.getElementById("delay")
+			const body = JSON.stringify({
+				"value": parseFloat(delay_control.value),
+			});
+			const res = await fetch('/api/delay', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body,
+			});
+			update_ui_state()
+		}
+
+		async function update_ui_state() {
+			const intensity_control = document.getElementById("intensity")
+			intensity_control.value = await get_intensity();
+			const delay_control = document.getElementById("delay")
+			delay_control.value = await get_delay();
+		}
+		update_ui_state();
 	</script>
 </body>
 </html>
