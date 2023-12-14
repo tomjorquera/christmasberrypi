@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -11,42 +13,67 @@ from signal import pause
 
 # Tree control
 
-tree = LEDBoard(*range(2,28),pwm=True)
+LED_ORDER = [4,15,13,21,25,8,5,10,16,17,27,26,24,9,12,6,20,19,14,18,11,7,23,22,2]
+
+tree = LEDBoard(*LED_ORDER,
+                pwm=True)
 delay_value = 0.4
 intensity_coef = 0.8
 
+def default_mode():
+    def intensity(coef):
+        value_gen = random_values()
+        while value_gen:
+            yield next(value_gen) * coef
 
-def intensity(coef):
-    value_gen = random_values()
-    while value_gen:
-        yield next(value_gen) * coef
-
-def on():
     for led in tree:
         if led.pin.number == 2:
             # star led
             led.pulse(2, 2)
+            led.source = None
             continue
         led.source_delay = delay_value
         led.source = intensity(intensity_coef)
 
-def off():
-    for led in tree:
-        led.source = None
-        led.off()
 
+def calendar_mode():
+    def turn_on_if_day(pin_day):
+        while True:
+            today = datetime.today()
+            current_day = today.day
+            if current_day >= pin_day:
+                yield intensity_coef
+            else:
+                yield 0
+
+    for day, led in enumerate(tree.leds):
+        led.source_delay = delay_value
+        led.source = turn_on_if_day(day + 1)
+
+
+modes = [default_mode, calendar_mode]
+current_mode = 0
 
 # REST API
 
 app = FastAPI()
 
 @app.get("/api/on")
-def get_on() -> None:
-    on()
+def on():
+    modes[current_mode]()
 
 @app.get("/api/off")
-def get_off() -> None:
-    off()
+def off():
+    for led in tree:
+        led.source = None
+        led.off()
+
+@app.get("/api/switch")
+def switch_mode():
+    global current_mode
+    current_mode += 1
+    current_mode %= len(modes)
+    on()
 
 @app.get("/api/intensity")
 def get_intensity() -> float:

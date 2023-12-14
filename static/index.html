@@ -56,6 +56,9 @@
 		<button onclick="turnon()">ON</button>
 	</div>
 	<div class="inputcontainer">
+		<button onclick="switch_mode()">SWITCH MODE</button>
+	</div>
+	<div class="inputcontainer">
 		<label for="intensity">INTENSITY</label>
 		<input type="range" id="intensity" min="0.0" max="1.0" step="0.1" value="0.8" list="intensity_markers" onchange="put_intensity()"></input>
 		<datalist id="intensity_markers">
@@ -109,6 +112,14 @@
 
 		function turnon() {
 			fetch('/api/on', {
+			    method: 'GET',
+			})
+			update_ui_state();
+
+		}
+
+		async function switch_mode() {
+			fetch('/api/switch', {
 			    method: 'GET',
 			})
 			update_ui_state();
