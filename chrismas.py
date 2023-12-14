@@ -40,8 +40,6 @@ def off():
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 @app.get("/api/on")
 def get_on() -> None:
     on()
@@ -79,6 +77,8 @@ def set_intensity(delay: Delay) -> None:
     delay_value = min(delay_value, 2.0)
     delay_value = max(delay_value, 0.0)
     on()
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == '__main__':
     on()
