@@ -1,4 +1,5 @@
 from datetime import datetime
+from threading import Timer
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +21,7 @@ tree = LEDBoard(*LED_ORDER,
 delay_value = 0.4
 intensity_coef = 0.8
 
-def default_mode():
+def party_mode():
     def intensity(coef):
         value_gen = random_values()
         while value_gen:
@@ -51,8 +52,26 @@ def calendar_mode():
         led.source = turn_on_if_day(day + 1)
 
 
-modes = [default_mode, calendar_mode]
+def is_it_christmas_yet():
+    today = datetime.today()
+    return (today.day == 25
+            and today.hour == 00
+            and today.minute == 00)
+
+
+def check_for_christmas_party():
+    if is_it_christmas_yet():
+        current_mode = -1
+        modes[current_mode]()
+    else:
+        christimer = Timer(1, check_for_christmas_party)
+        christimer.start()
+
+
+modes = [calendar_mode, party_mode]
 current_mode = 0
+
+check_for_christmas_party()
 
 # REST API
 
