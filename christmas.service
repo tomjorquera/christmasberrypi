@@ -1,9 +1,9 @@
 [Unit]
-Description=Chrismas lights
+Description=Christmas lights
 After=getty.target
 
 [Service]
-ExecStart=/home/tom/chrismas_start.sh
+ExecStart=/home/tom/christmas_start.sh
 
 [Install]
 WantedBy=default.target
